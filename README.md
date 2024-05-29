@@ -18,7 +18,7 @@ This is an e-commerce project built using Django 5.0.3. The project includes mul
 1. **Clone the repository**:
     ```bash
     git clone https://github.com/AdarshPBaiju/Ecommerce-with-payment.git
-    cd ecomm
+    cd Ecommerce-with-payment
     ```
 
 2. **Create a virtual environment**:
