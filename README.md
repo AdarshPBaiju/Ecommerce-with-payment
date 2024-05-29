@@ -129,4 +129,6 @@ Ensure that the following settings are configured correctly in `ecomm/settings.p
     Users can place orders and view their order history. Admins can manage orders through the admin interface.
 
 ![Admin Dashboard](https://media.licdn.com/dms/image/D562DAQFFFbHf26pjhg/profile-treasury-image-shrink_1920_1920/0/1712985491525?e=1717592400&v=beta&t=NRnPXy1wc42M0a5rK6-BdkjEEo0NJL4rKVnXP7sIHLk)
+
+
 Home Page
