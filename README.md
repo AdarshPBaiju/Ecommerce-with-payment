@@ -10,8 +10,6 @@ This is an e-commerce project built using Django 5.0.3. The project includes mul
 - [Applications](#applications)
 - [Features](#features)
 - [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
 
 ## Installation
 
