@@ -1,4 +1,6 @@
-![image](https://github.com/AdarshPBaiju/Ecommerce-with-payment/assets/161452962/58e1524c-f451-40a1-9986-dd9ace60c464)# Ecomm Project
+![image]([https://github.com/AdarshPBaiju/Ecommerce-with-payment/assets/161452962/58e1524c-f451-40a1-9986-dd9ace60c464](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxJzFGswt9QjK3n1cJOSzLWznGBvh_irztkw&s))
+
+# Ecomm Project
 
 
 
