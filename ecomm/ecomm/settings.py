@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['192.168.1.2','127.0.0.1','172.235.17.58','adarshpbaiju.site','www.adarshpbaiju.site']
+ALLOWED_HOSTS = []
 SECURE_CROSS_ORIGIN_OPENER_POLICY='same-origin-allow-popups'
 
 
