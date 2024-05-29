@@ -1,0 +1,229 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Checkout{% endblock title %}
+{% block content %}
+{% include "includes/alert.html" %}
+<style>
+    /* Style for suggestion container */
+    #suggestions-container {
+        max-height: 150px; /* Adjust as needed */
+        overflow-y: auto;
+        border-radius: 5px;
+        display: none; /* Initially hide the suggestion box */
+        position: absolute;
+        width: calc(100% - 2px); /* Adjust for border width */
+        background-color: #fff;
+        z-index: 1000; /* Ensure the suggestion box appears above other content */
+        border: 1px solid #ccc; /* Border style */
+    }
+
+    /* Style for suggestion items */
+    .suggestion-item {
+        cursor: pointer;
+        padding: 8px;
+        border-bottom: 1px solid #ccc;
+    }
+
+    /* Style for suggestion items when hovered */
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+</style>
+		<main class="main checkout">
+			<div class="page-content pt-7 pb-10 mb-10">
+				<div class="step-by pr-4 pl-4">
+					<h3 class="title title-simple title-step">1. Shopping Cart</h3>
+					<h3 class="title title-simple title-step active">2. Checkout</h3>
+					<h3 class="title title-simple title-step">3. Payment</h3>
+					<h3 class="title title-simple title-step">4. Order Complete</h3>
+				</div>
+				<div class="container mt-7">
+					<form action="{% url "place_order" %}" class="form" method="post">
+                        {% csrf_token %}
+						<div class="row">
+							<div class="col-lg-7 mb-6 mb-lg-0 pr-lg-4">
+								<h3 class="title title-simple text-left text-uppercase">Billing Details</h3>
+								<div class="row">
+									<div class="col-xs-6">
+										<label>First Name *</label>
+										<input type="text" class="form-control" name="first_name" value="{{user_profile.user.first_name}}" required />
+									</div>
+									<div class="col-xs-6">
+										<label>Last Name *</label>
+										<input type="text" class="form-control" name="last_name" value="{{user_profile.user.last_name}}" required />
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-6">
+										<label>Email *</label>
+										<input type="text" class="form-control" name="email" value="{{user_profile.user.email}}" required />
+									</div>
+									<div class="col-xs-6">
+										<label>Phone Number *</label>
+										<input type="text" class="form-control" name="phone" value="{{user_profile.user.phone_number}}" required oninput="this.value = this.value.replace(/[^0-9+]/g, '')"/>
+									</div>
+								</div>
+								<div class="col-xs">
+									<label>Flat, House Name., Building, Company, Apartment *</label>
+									<input type="text" class="form-control" value="{{user_profile.house_no}}" name="house_no" required />
+								</div>
+								<div class="row">
+									<div class="col-xs-6">
+										<label>Area, Street, Sector, Village *</label>
+										<input type="text" class="form-control" value="{{user_profile.area}}" name="area" required />
+									</div>
+									<div class="col-xs-6">
+										<label>Landmark *</label>
+										<input type="text" id="landmark" class="form-control" value="{{user_profile.landmark}}" name="landmark" required />
+										<div id="suggestions-container">
+											<div id="suggestions"></div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-6">
+										<label>Country *</label>
+										<input type="text" class="form-control" value="{{user_profile.country}}" name="country" required />
+									</div>
+									<div class="col-xs-6">
+										<label>State *</label>
+										<input type="text" class="form-control" value="{{user_profile.state}}" name="state" required />
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-xs-6">
+										<label>Town / City *</label>
+										<input type="text" class="form-control" value="{{user_profile.city}}" name="city" required />
+									</div>
+									<div class="col-xs-6">
+										<label>Pincode *</label>
+										<input type="number" class="form-control" value="{{user_profile.pincode}}" name="pincode" required/>
+									</div>
+								</div>
+								<h2 class="title title-simple text-uppercase text-left">Additional Information</h2>
+								<label>Order Notes (Optional)</label>
+								<textarea class="form-control pb-2 pt-2 mb-0" cols="30" rows="5" name='order_note'
+									placeholder="Notes about your order, e.g. special notes for delivery"></textarea>
+							</div>
+							<aside class="col-lg-5 sticky-sidebar-wrapper">
+								<div class="sticky-sidebar mt-1" data-sticky-options="{'bottom': 50}">
+									<div class="summary pt-5">
+										<h3 class="title title-simple text-left text-uppercase">Your Order</h3>
+										<table class="order-table">
+											<thead>
+												<tr>
+													<th>Product</th>
+													<th></th>
+												</tr>
+											</thead>
+											<tbody>
+                                                {% for cart_item in cart_items %}
+												<tr>
+													<td class="product-name">{{cart_item.product|truncatechars:18}}
+                                                        {% if cart_item.variation.all %}
+                                                        {% for item in cart_item.variation.all %}
+                                                        <span class="product-quantity">&nbsp;{{item.variation_category|capfirst}} : {{item.variation_value|capfirst}}</span>
+                                                        {% endfor %}
+                                                        {% endif %}
+                                                        <span class="product-quantity">×&nbsp;{{cart_item.quantity}}</span>
+                                                    </td>
+													<td class="product-total text-body">$ {{cart_item.sub_total}}</td>
+												</tr>
+                                                {% endfor %}
+												<tr class="summary-subtotal">
+													<td>
+														<h4 class="summary-subtitle">Subtotal</h4>
+													</td>
+													<td class="summary-subtotal-price pb-0 pt-0">$ {{total}}</td>
+												</tr>
+												<tr class="summary-subtotal">
+													<td>
+														<h4 class="summary-subtitle">Tax</h4>
+													</td>
+													<td class="summary-subtotal-price pb-0 pt-0">$ {{ tax|floatformat:"2" }}</td>
+												</tr>
+												<tr class="summary-subtotal">
+													<td>
+														<h4 class="summary-subtitle">Shipping Cost</h4>
+													</td>
+													<td class="summary-subtotal-price pb-0 pt-0">{% if shipping_cost == 0 %}
+                                                        Free
+                                                    {% else %}
+                                                        $ {{ shipping_cost }}
+                                                    {% endif %}</td>
+												</tr>
+												<tr class="summary-total">
+													<td class="pb-0">
+														<h4 class="summary-subtitle">Grand Total</h4>
+													</td>
+													<td class=" pt-0 pb-0">
+														<p class="summary-total-price ls-s text-primary" style="font-size: 16px; text-align: end;">${{ grand_total|floatformat:"2" }}</p>
+													</td>
+												</tr>
+											</tbody>
+										</table>
+										<button type="submit" class="btn btn-dark btn-rounded btn-order">Place Order</button>
+									</div>
+								</div>
+							</aside>
+						</div>
+					</form>
+				</div>
+			</div>
+		</main>
+		<!-- End Main -->
+		<script>
+			// Function to fetch landmarks from the Nominatim API
+			function fetchLandmarks(input) {
+				fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}&addressdetails=1&limit=5`)
+					.then(response => response.json())
+					.then(data => {
+						const landmarks = data.map(item => item.display_name);
+						displayLandmarks(landmarks);
+					})
+					.catch(error => {
+						console.error('Error:', error);
+					});
+			}
+			
+			// Function to display landmarks as suggestions
+			function displayLandmarks(landmarks) {
+				const suggestionsContainer = document.getElementById("suggestions");
+				suggestionsContainer.innerHTML = "";
+			
+				landmarks.forEach(landmark => {
+					const suggestionItem = document.createElement("div");
+					suggestionItem.textContent = landmark;
+					suggestionItem.classList.add("suggestion-item");
+					suggestionItem.addEventListener("click", () => {
+						document.getElementById("landmark").value = landmark;
+						suggestionsContainer.innerHTML = ""; // Clear suggestion box after selection
+						suggestionsContainer.parentElement.style.display = "none"; // Hide suggestion box
+					});
+					suggestionsContainer.appendChild(suggestionItem);
+				});
+			
+				const suggestionsContainerParent = suggestionsContainer.parentElement;
+				if (landmarks.length > 0) {
+					suggestionsContainerParent.style.display = "block"; // Show suggestion box
+				} else {
+					suggestionsContainerParent.style.display = "none"; // Hide suggestion box if there are no landmarks
+				}
+			}
+			
+			// Function to handle user input and fetch landmarks
+			function handleInput() {
+				const input = document.getElementById("landmark").value.trim();
+			
+				if (input.length > 2) { // Minimum characters to trigger landmark suggestions (adjust as needed)
+					fetchLandmarks(input);
+				} else {
+					document.getElementById("suggestions").innerHTML = ""; // Clear suggestions if input is too short
+					document.getElementById("suggestions-container").style.display = "none"; // Hide suggestion box if input is too short
+				}
+			}
+			
+			// Attach event listener to input field to handle user input
+			document.getElementById("landmark").addEventListener("input", handleInput);
+			</script>
+        {% endblock content %}

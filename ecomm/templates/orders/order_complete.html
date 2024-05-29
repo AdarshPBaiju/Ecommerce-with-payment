@@ -1,0 +1,165 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Order Complete{% endblock title %}
+{% block content %}
+
+		<main class="main order">
+			<div class="page-content pt-7 pb-10 mb-10">
+				<div class="step-by pr-4 pl-4">
+					<h3 class="title title-simple title-step active"><a>1. Shopping Cart</a></h3>
+					<h3 class="title title-simple title-step active"><a>2. Checkout</a></h3>
+					<h3 class="title title-simple title-step active"><a>4.. Checkout</a></h3>
+					<h3 class="title title-simple title-step active"><a>3. Order Complete</a></h3>
+				</div>
+				<div class="container mt-8">
+					<div class="order-message mr-auto ml-auto">
+						<div class="icon-box d-inline-flex align-items-center">
+							<div class="icon-box-icon mb-0">
+								<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 50 50" enable-background="new 0 0 50 50" xml:space="preserve">
+									<g>
+										<path fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="bevel" stroke-miterlimit="10" d="
+											M33.3,3.9c-2.7-1.1-5.6-1.8-8.7-1.8c-12.3,0-22.4,10-22.4,22.4c0,12.3,10,22.4,22.4,22.4c12.3,0,22.4-10,22.4-22.4
+											c0-0.7,0-1.4-0.1-2.1"></path>
+											<polyline fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="bevel" stroke-miterlimit="10" points="
+											48,6.9 24.4,29.8 17.2,22.3 	"></polyline>
+									</g>
+								</svg>
+							</div>
+							<div class="icon-box-content text-left">
+								<h5 class="icon-box-title font-weight-bold lh-1 mb-1">Thank You!</h5>
+								<p class="lh-1 ls-m">Your order has been received</p>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="order-results" >
+						<div class="overview-item">
+							<span>Order ID:</span>
+							<strong style="font-size: 15px;">{{order_number}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Transaction ID:</span>
+							<strong style="font-size: 15px;">{{transID}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Status:</span>
+                            {% if order.status == 'OUT_FOR_DELIVERY' %}
+							<strong style="font-size: 15px;">Out For Delivery</strong>
+                            {% else %}
+							<strong style="font-size: 15px;">{{order.status}}</strong>
+                            {% endif %}
+						</div>
+						<div class="overview-item">
+							<span>Date:</span>
+							<strong style="font-size: 15px;">{{order.created_at}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Email:</span>
+							<strong style="font-size: 15px;">{{order.email}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Payment method:</span>
+							<strong style="font-size: 15px;">{{order.payment.payment_method}}</strong>
+						</div>
+                        {% if order.status == 'SHIPPED' or order.status == 'OUT_FOR_DELIVERY' %}
+						<div class="overview-item">
+							<span>Courier Partner:</span>
+							<strong style="font-size: 15px;">{{order.courier_company_name}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Tracking ID:</span>
+							<strong style="font-size: 15px;">{{order.tracking_id}}</strong>
+						</div>
+                        {% endif %}
+					</div>
+					<h2 class="title title-simple text-left pt-4 font-weight-bold text-uppercase">Order Details</h2>
+					<div class="order-details">
+						<table class="order-details-table">
+							<thead>
+								<tr class="summary-subtotal">
+									<td>
+										<h3 class="summary-subtitle">Product</h3>
+									</td>
+									<td></td>
+								</tr>
+							</thead>
+							<tbody>
+                                {% for item in ordered_products %}
+								<tr>
+									<td class="product-name">{{item.product|truncatechars:40}}
+                                        
+                                        {% if item.variation.all %}
+                                        {% for i in item.variation.all %}
+                                        <span style="font-weight: 400;">&nbsp;{{i.variation_category|capfirst}} : {{i.variation_value|capfirst}}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                    
+                                        <span>&nbsp;&nbsp; <i class="fas fa-times"></i>&nbsp;&nbsp;
+											{{item.quantity}}</span></td>
+									<td class="product-price">${{item.product_price}}</td>
+								</tr>
+                                {% endfor %}
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Subtotal:</h4>
+									</td>
+									<td class="summary-subtotal-price">${{subtotal}}</td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Tax(3%):</h4>
+									</td>
+									<td class="summary-subtotal-price">${{tax|floatformat:"2"}}</td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Shipping:</h4>
+									</td>
+									<td class="summary-subtotal-price">
+                                        {% if shipping_cost == 0 %}
+                                            Free
+                                        {% else %}
+                                            {{ shipping_cost }}
+                                        {% endif %}
+                                    </td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Payment method:</h4>
+									</td>
+									<td class="summary-subtotal-price">{{order.payment.payment_method}}</td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Total:</h4>
+									</td>
+									<td>
+										<p class="summary-total-price">${{grand_total|floatformat:"2"}}</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h2 class="title title-simple text-left pt-10 mb-2">Billing Address</h2>
+					<div class="address-info pb-8 mb-6">
+						<p class="address-detail pb-2">
+							{{order.full_name}}<br>
+							{{order.house_no}}<br>
+							{{order.area}}<br>
+							{{order.landmark}}<br>
+							{{order.city}}<br>
+							{{order.state}}<br>
+							{{order.country}}<br>
+							{{order.pincode}}
+						</p>
+						<p class="email">{{order.email}}</p>
+						<p class="email">{{order.phone}}</p>
+					</div>
+
+					<a href="{% url "home" %}" class="btn btn-icon-left btn-dark btn-back btn-rounded btn-md mb-4"><i class="d-icon-arrow-left"></i> Back to Home</a>
+				</div>
+			</div>
+		</main>
+		<!-- End Main -->
+{% endblock content %}

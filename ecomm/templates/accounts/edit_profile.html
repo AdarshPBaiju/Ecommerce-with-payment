@@ -1,0 +1,351 @@
+{% extends "layout/base.html" %}
+{% block title %}Dashboard{% endblock title %}
+{% block content %}
+{% load static %}
+{% include "includes/alert.html" %}
+<style>
+    /* Styling for image preview */
+    #image-preview {
+        width: 150px; /* Set the width of the container */
+        height: 150px; /* Set the height of the container */
+        border: 1px groove #ddd;
+        overflow: hidden;
+        padding-left: 0;
+        padding-right: 0;
+        border-radius: 50%;
+    }
+    #image-preview img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover; /* Make the image fill the container while maintaining aspect ratio */
+    }
+    /* Hide file input */
+    .hidden-input {
+        display: none;
+    }
+    /* #profile-pic {
+        display: none;
+    } */
+    /* Style label to mimic input field */
+    #upload-label {
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+    
+    
+    /* Style for suggestion box */
+    #suggestion-box {
+        max-height: 150px; /* Adjust as needed */
+        overflow-y: auto;
+        border-radius: 5px;
+        display: none; /* Initially hide the suggestion box */
+        position: absolute;
+        width: calc(100% - 2px); /* Adjust for border width */
+        background-color: #fff;
+        z-index: 1000; /* Ensure the suggestion box appears above other content */
+        border: 1px solid #ccc; /* Border style */
+    }
+
+    /* Style for suggestion items */
+    .suggestion-item {
+        cursor: pointer;
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* Style for suggestion items when hovered */
+    .suggestion-item:hover {
+        background-color: #f0f0f0;
+    }
+
+
+/* li {
+    font-size: 5px;
+    font-weight: 400;
+    text-align: start;
+} */
+</style>
+<main class="main account">
+    <nav class="breadcrumb-nav">
+        <div class="container">
+            <ul class="breadcrumb">
+                <li><a href="{% url "home" %}"><i class="d-icon-home"></i></a></li>
+                <li>Account</li>
+            </ul>
+        </div>
+    </nav>
+    <div class="page-content mt-4 mb-10 pb-6">
+        <div class="container">
+            <h2 class="title title-center mb-10">Edit Profile</h2>
+            <div class="tab tab-vertical gutter-lg">
+                {% include "includes/dashboard_sidebar.html" %}
+                <main class="col-md-9" style="background-color: rgba(255, 255, 255, 0.873); border: 1px solid rgb(163, 163, 163); border-radius: 10px; padding: 30px; margin-left: 20px;">
+                    <div class="tab-pane" id="account">
+                        <form action="{% url "edit_profile" %}" method="post" enctype="multipart/form-data" class="form">
+                            {% csrf_token %}
+                            <div class="row">
+                                <!-- Hidden input for file upload -->
+                                <!-- <input type="file" id="profile-pic" class="form-control" accept="image/*" > -->
+                                {{profile_form.profile_picture}}
+                                <!-- Image preview container -->
+                                <div id="image-preview" style="margin-bottom: 20px;">
+                                    <!-- Dummy image to display if no image selected, wrapped in label for clickability -->
+                                    <label for="id_profile_picture" id="upload-label">
+                                        <img id="preview-image" src="{{ userprofile.profile_picture.url }}" alt="Profile Picture">
+                                    </label>
+                                    <button id="remove-selection-btn" style="display: none; position: absolute; top: 20px; right: 20px; background-color: #ffffff00; border: none; cursor: pointer;">
+                                        <i class="fa fa-times-circle"></i> <!-- You can use an appropriate icon here -->
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <label>First Name</label>
+                                    {{user_form.first_name}}
+                                </div>
+                                <div class="col-sm-4">
+                                    <label>Last Name</label>
+                                    {{user_form.last_name}}
+                                </div>
+                                <div class="col-sm-4">
+                                    <label>Phone</label>
+                                    {{user_form.phone_number}}
+                                    <small id="phoneNumberError" class="text-danger" style="display: none;"></small>
+                                    <small id="successMessage" class="text-success" style="display: none;"></small>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <label>Flat, House name., Building, Company, Apartment</label>
+                                {{profile_form.house_no}}
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>Area</label>
+                                    {{profile_form.area}}
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>Landmark</label>
+                                    {{profile_form.landmark}}
+                                    <div id="suggestion-box"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label>City</label>
+                                    {{profile_form.city}}
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>State</label>
+                                    {{profile_form.state}}
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>Country</label>
+                                    {{profile_form.country}}
+                                </div>
+                                <div class="col-sm-6">
+                                    <label>Pincode</label>
+                                    {{profile_form.pincode}}
+                                </div>
+                            </div>
+                            <button id="saveChangesButton" type="submit" class="btn btn-primary">SAVE CHANGES</button>
+                        </form>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- End Main -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // JavaScript for image preview
+    const imagePreview = document.getElementById('preview-image');
+    const profilePicInput = document.getElementById('id_profile_picture');
+    const removeSelectionBtn = document.getElementById('remove-selection-btn');
+
+    // Handle click on preview image to show remove button
+    imagePreview.addEventListener('click', function(event) {
+        // Show the remove button when the preview image is clicked
+        removeSelectionBtn.style.display = 'block';
+    });
+
+    // Update image preview when a file is selected
+    profilePicInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imagePreview.src = e.target.result;
+                removeSelectionBtn.style.display = 'block'; // Show remove button when a file is selected
+            }
+            reader.readAsDataURL(file);
+        } else {
+            // If no file selected, revert to dummy image
+            imagePreview.src = '{{ userprofile.profile_picture.url }}';
+            removeSelectionBtn.style.display = 'none'; // Hide remove button when no file is selected
+        }
+    });
+
+    // Allow changing the image by clicking the dummy preview
+    document.getElementById('upload-label').addEventListener('click', function(event) {
+        // Prevent default behavior of label click
+        event.preventDefault();
+        // Click directly on the file input
+        profilePicInput.click();
+    });
+
+    // Handle click on remove selection button
+    removeSelectionBtn.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent form submission
+        profilePicInput.value = ''; // Clear the file input
+        imagePreview.src = '{{ userprofile.profile_picture.url }}'; // Revert to dummy image
+        removeSelectionBtn.style.display = 'none'; // Hide the remove button
+    });
+
+// /////////////////////////////////////////
+
+    // Function to fetch suggestions from Nominatim API
+function fetchSuggestions(input) {
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${input}`)
+        .then(response => response.json())
+        .then(data => {
+            displaySuggestions(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+// Function to display suggestions
+function displaySuggestions(suggestions) {
+    var suggestionBox = document.getElementById("suggestion-box");
+    suggestionBox.innerHTML = "";
+
+    suggestions.forEach(function(suggestion) {
+        var suggestionItem = document.createElement("div");
+        suggestionItem.textContent = suggestion.display_name;
+        suggestionItem.classList.add("suggestion-item");
+        suggestionItem.addEventListener("click", function() {
+            document.getElementById("id_landmark").value = suggestion.display_name;
+            suggestionBox.innerHTML = ""; // Clear suggestion box after selection
+            suggestionBox.style.display = "none"; // Hide suggestion box
+        });
+        suggestionBox.appendChild(suggestionItem);
+    });
+
+    if (suggestions.length > 0) {
+        suggestionBox.style.display = "block"; // Show suggestion box
+        suggestionBox.style.border = "1px solid #ccc"; // Show border
+    } else {
+        suggestionBox.style.display = "none"; // Hide suggestion box
+        suggestionBox.style.border = "none"; // Hide border
+    }
+}
+
+// Function to handle user input and fetch suggestions
+function handleInput() {
+    var input = document.getElementById("id_landmark").value.trim();
+
+    if (input.length > 2) { // Minimum characters to trigger suggestions
+        fetchSuggestions(input);
+    } else {
+        document.getElementById("suggestion-box").style.display = "none"; // Hide suggestion box if input is too short
+    }
+}
+
+// Attach event listener to input field to handle user input
+document.getElementById("id_landmark").addEventListener("input", handleInput);
+
+// /////////////////////////////////
+
+
+$(document).ready(function() {
+    // Function to preprocess the phone number
+    function preprocessPhoneNumber(phoneNumber) {
+        // Check if the phone number starts with "+91"
+        if (!phoneNumber.startsWith('+91')) {
+            // If not, add "+91" before the number
+            phoneNumber = '+91' + phoneNumber;
+        }
+        return phoneNumber;
+    }
+
+    // Function to enable or disable the "SAVE CHANGES" button and set its class
+    function toggleSaveButton(disabled) {
+        var saveButton = $('#saveChangesButton');
+        saveButton.prop('disabled', disabled);
+        // Set button's class based on the disabled state
+        if (disabled) {
+            saveButton.addClass('btn-muted').removeClass('btn-primary');
+        } else {
+            saveButton.addClass('btn-primary').removeClass('btn-muted');
+        }
+    }
+
+    $('#id_phone_number').on('input', function() {
+        var phoneNumber = $(this).val().trim();
+
+        // Check if the phone number is empty
+        if (phoneNumber === '') {
+            // Display a message indicating that the phone number is required
+            $('#phoneNumberError').text('Phone number is required').show().css('color', 'red');
+            // Hide the success message
+            $('#successMessage').hide();
+            // Disable the "SAVE CHANGES" button and set its class to 'btn-muted'
+            toggleSaveButton(true);
+            return; // Exit the function if the phone number is empty
+        }
+
+        // Preprocess the phone number
+        phoneNumber = preprocessPhoneNumber(phoneNumber);
+
+        // Make sure the phone number has a valid length
+        if (phoneNumber.length !== 13) {
+            $('#phoneNumberError').text('Invalid phone number').show().css('color', 'red');
+            // Hide the success message
+            $('#successMessage').hide();
+            // Disable the "SAVE CHANGES" button and set its class to 'btn-muted'
+            toggleSaveButton(true);
+            return; // Exit the function if the phone number length is invalid
+        }
+
+        // Make AJAX request to validate phone number
+        $.ajax({
+            url: "{% url 'validate_phone_number' %}",
+            type: "GET",
+            data: {
+                'phone_number': phoneNumber
+            },
+            success: function(response) {
+                // Handle success response
+                if (response.phone_number_exists) {
+                    // Show error message that the phone number is already in use
+                    $('#phoneNumberError').text('Phone number is already in use').show().css('color', 'red');
+                    // Hide the success message
+                    $('#successMessage').hide();
+                    // Disable the "SAVE CHANGES" button and set its class to 'btn-muted'
+                    toggleSaveButton(true);
+                } else {
+                    // If phone number is available, show the success message
+                    $('#phoneNumberError').hide();
+                    $('#successMessage').text('Phone number is available').show().css('color', 'green');
+                    // Enable the "SAVE CHANGES" button and set its class to 'btn-primary'
+                    toggleSaveButton(false);
+                }
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                console.error("Error:", error);
+                // Disable the "SAVE CHANGES" button in case of an error and set its class to 'btn-muted'
+                toggleSaveButton(true);
+            }
+        });
+    });
+});
+
+
+</script>
+{% endblock content %}

@@ -1,0 +1,101 @@
+{% autoescape off %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Email Activation</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+        margin: 0;
+    }
+
+    .container {
+        width: 700px; /* Adjust the width as needed */
+        height: 500px;
+        margin: auto; /* Set left and right margins to auto */
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2, p {
+        text-align: center;
+    }
+
+    .branding {
+        text-align: center;
+        margin-bottom: 20px;
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .branding img {
+        width: 150px;
+        height: auto;
+    }
+
+    .activation-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .activation-link a {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: #ffffff;
+        text-decoration: none;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .activation-link a:hover {
+        background-color: #0056b3;
+    }
+
+    .thank-you {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .copy-link {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="branding">
+        <img src="https://d-themes.com/html/riode/landing/images/logo.png" alt="Your Company Logo">
+        <h1>RIODE ECOMM</h1>
+    </div>
+    <br>
+    <p>Dear {{ user.first_name }},</p>
+    <p>Thank you for registering with RIODE ECOMM. To activate your account, please click the button below:</p>
+    <div class="activation-link">
+        <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}">Activate Account</a>
+    </div>
+    <div class="thank-you">
+        <p>Thank you for choosing RIODE ECOMM!</p>
+    </div>
+    <div class="copy-link">
+        <p>If the button above didn't work, you can copy and paste the following link into your browser:</p>
+        <a href="http://{{ domain }}{% url 'activate' uidb64=uid token=token %}">http://{{ domain }}{% url 'activate' uidb64=uid token=token %}</a>
+    </div>
+</div>
+</body>
+</html>
+{% endautoescape %}

@@ -1,0 +1,321 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}Payment{% endblock title %}
+{% block content %}
+
+<style>
+    .card {
+      border: 1px solid #e1e1e1;
+	  border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+  </style>
+  <style>
+	#razorpay-button {
+		background-color: #F37254;
+		border: none;
+		color: white;
+		padding: 15px 32px;
+		text-align: center;
+		text-decoration: none;
+		display: inline-block;
+		font-size: 16px;
+		margin: 4px 2px;
+		cursor: pointer;
+		border-radius: 8px;
+		box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+		transition: 0.3s;
+		width: 100%;
+	}
+
+	#razorpay-button:hover {
+		background-color: #f37154ed;
+	}
+</style>
+{% include "includes/alert.html" %}
+		<main class="main cart">
+			<div class="page-content pt-7 pb-10">
+				<div class="step-by pr-4 pl-4">
+                    <h3 class="title title-simple title-step active"><a>1. Shopping Cart</a></h3>
+                    <h3 class="title title-simple title-step active"><a>2. Checkout</a></h3>
+                    <h3 class="title title-simple title-step active"><a>3. Payment</a></h3>
+					<h3 class="title title-simple title-step"><a>4. Order Complete</a></h3>
+				</div>
+				<div class="container mt-7 mb-2">
+					<h4 class="text-center mb-10">Review Your Order and Make Payment</h4>
+					<div class="row">
+						<div class="col-lg-8 col-md-12 pr-lg-4">
+							<div class="card">
+                                <h5 class="card-title">Billing Address</h5>
+                                <div class="card-body">
+                                  <p class="card-text mb-0">{{order.full_name}}</p>
+                                  <p class="card-text mb-0">{{order.email}}</p>
+                                  <p class="card-text mb-0">{{order.phone}}</p>
+                                  <p class="card-text mb-0">{{order.house_no}}</p>
+                                  <p class="card-text mb-0">{{order.area}}</p>
+                                  <p class="card-text mb-0">{{order.landmark}}</p>
+                                  <p class="card-text mb-0">{{order.city}}, {{order.state}}</p>
+                                  <p class="card-text mb-0">{{order.country}}</p>
+                                  <p class="card-text mb-0">{{order.pincode}}</p>
+								  {% if order.order_note %}
+								  <b>Order Note: </b>{{order.order_note}}
+								  {% endif %}
+                                </div>
+                              </div>
+							  {% comment %} <div class="card">
+                                <h5 class="card-title">Payment Method</h5>
+                                <div class="card-body">
+                                  <p class="card-text">Paypal</p>
+                                </div>
+                              </div> {% endcomment %}
+							<div class="card">
+                                <h5 class="card-title">Review Products</h5>
+                                <div class="card-body">
+									<table class="order-table">
+										<thead>
+											<tr>
+												<th style="text-align: start;">Product</th>
+												<th></th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for cart_item in cart_items %}
+											<tr>
+												<td class="product-name">{{cart_item.product|truncatechars:18}}
+													{% if cart_item.variation.all %}
+													{% for item in cart_item.variation.all %}
+													<span class="product-quantity">&nbsp;{{item.variation_category|capfirst}} : {{item.variation_value|capfirst}}</span>
+													{% endfor %}
+													{% endif %}
+													<span class="product-quantity">×&nbsp;{{cart_item.quantity}}</span>
+												</td>
+												<td class="product-total text-body" style="text-align: end;">$ {{cart_item.sub_total}}</td>
+											</tr>
+											{% endfor %}
+											<tr class="summary-subtotal">
+												<td>
+													<h4 class="summary-subtitle">Subtotal</h4>
+												</td>
+												<td class="summary-subtotal-price pb-0 pt-0" style="text-align: end;">$ {{total}}</td>
+											</tr>
+											<tr class="summary-subtotal">
+												<td>
+													<h4 class="summary-subtitle">Tax</h4>
+												</td>
+												<td class="summary-subtotal-price pb-0 pt-0" style="text-align: end;">$ {{ tax|floatformat:"2" }}</td>
+											</tr>
+											<tr class="summary-subtotal">
+												<td>
+													<h4 class="summary-subtitle">Shipping Cost</h4>
+												</td>
+												<td class="summary-subtotal-price pb-0 pt-0" style="text-align: end;">{% if shipping_cost == 0 %}
+													Free
+												{% else %}
+													$ {{ shipping_cost }}
+												{% endif %}</td>
+											</tr>
+											<tr class="summary-total">
+												<td class="pb-0">
+													<h4 class="summary-subtitle">Grand Total</h4>
+												</td>
+												<td class=" pt-0 pb-0">
+													<p class="summary-total-price ls-s text-primary" style="font-size: 16px; text-align: end;">$ {{ grand_total|floatformat:"2" }}</p>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+                                </div>
+                              </div>
+						</div>
+						<aside class="col-lg-4 sticky-sidebar-wrapper">
+							<div class="sticky-sidebar" data-sticky-options="{'bottom': 20}">
+								<div class="summary mb-4">
+									<h3 class="summary-title text-left">Cart Totals</h3>
+									<table class="shipping">
+										<tr class="summary-subtotal">
+											<td>
+												<h4 class="summary-subtitle">Subtotal</h4>
+											</td>
+											<td>
+												<p class="summary-subtotal-price">$ {{total}}</p>
+											</td>												
+										</tr>
+										<tr class="summary-subtotal">
+											<td>
+												<h4 class="summary-subtitle">Tax</h4>
+											</td>
+											<td>
+												<p class="summary-subtotal-price">$ {{ tax|floatformat:"2" }}</p>
+											</td>											
+										</tr>
+											<td>
+												<h4 class="summary-subtitle">Shipping</h4>
+											</td>
+											<td>
+												<p class="summary-subtotal-price">{% if shipping_cost == 0 %}
+													Free
+												{% else %}
+													$ {{ shipping_cost }}
+												{% endif %}</p>
+											</td>							
+										</tr>
+									</table>
+									<hr>
+									<table class="total">
+										<tr class="summary-subtotal">
+											<td>
+												<h4 class="summary-subtitle">Grand Total</h4>
+											</td>
+											<td>
+												<p class="summary-total-price ls-s" style='color:#2266cc
+                                                ;'>$ {{ grand_total|floatformat:"2" }}</p>
+											</td>												
+										</tr>
+									</table>
+									<!-- Set up a container element for the button -->
+    								<div id="paypal-button-container"></div>
+									<button id="razorpay-button">Pay with Razorpay</button>
+									<div id="loading-indicator" style="display: none;text-align: center;">Loading...</div>
+								</div>
+							</div>
+						</aside>
+					</div>
+				</div>
+			</div>
+		</main>
+		<!-- End Main -->
+		<!-- paypal script -->
+		<script src="https://www.paypal.com/sdk/js?client-id=Afwpg8_VmwvuECZYGJf4fKsxU72iqvEHkB6s1rMUMcu7usf-XAMP1ffdCjj8SipGN4mOI4utKamONqJJ"></script>
+		<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+		<script>
+
+			function getCookie(name) {
+				let cookieValue = null;
+				if (document.cookie && document.cookie !== '') {
+					const cookies = document.cookie.split(';');
+					for (let i = 0; i < cookies.length; i++) {
+						const cookie = cookies[i].trim();
+						if (cookie.substring(0, name.length + 1) === (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+			
+			var url = "{% url 'payments' %}";
+			var csrftoken = getCookie('csrftoken');
+			var orderID = "{{ order.order_number }}";
+			var payment_method;
+			var redirect_url = "{% url 'order_complete' %}";
+			var name="{{ order.first_name }} {{ order.last_name }}"
+			var email='{{ order.email }}'
+			var contact ='{{ order.phone }}'
+			var address='{{ order.house_no }}'
+
+
+			function showLoading() {
+				document.getElementById('loading-indicator').style.display = 'block';
+			}
+			
+			function hideLoading() {
+				document.getElementById('loading-indicator').style.display = 'none';
+			}
+			
+			// Fetch real-time conversion rate
+			fetch('https://api.exchangerate-api.com/v4/latest/USD')
+				.then(response => response.json())
+				.then(data => {
+					var usdToInrRate = data.rates.INR; // Get the conversion rate from USD to INR
+					// Call the payment functions with the fetched conversion rate
+					document.getElementById('razorpay-button').addEventListener('click', function() {
+						razorpayPayment(usdToInrRate);
+					});
+				})
+				.catch(error => {
+					console.error('Error fetching conversion rate:', error);
+				});
+			
+			function paypalPayment() {
+				payment_method = 'PayPal';
+				paypal.Buttons({
+					createOrder: function(data, actions) {
+						return actions.order.create({
+							purchase_units: [{
+								amount: {
+									value: "{{ grand_total }}"
+								}
+							}]
+						});
+					},
+					onApprove: function(data, actions) {
+						return actions.order.capture().then(function(details) {
+							showLoading();
+							sendData(details.id, payment_method, details.status);
+						});
+					}
+				}).render('#paypal-button-container');
+			}
+			
+			function razorpayPayment(usdToInrRate) {
+				payment_method = 'Razorpay';
+				var amountUSD = parseFloat("{{ grand_total }}").toFixed(2); // Amount in USD
+				var amountINR = (amountUSD * usdToInrRate * 100).toFixed(0); // Convert amount to INR in paisa
+				var options = {
+					key: 'rzp_test_8ave9oLFaMF9AV',
+					amount: amountINR, // amount in paisa
+					currency: 'INR',
+					name: 'Riode ecomm',
+					description: 'Ecomm Website',
+					prefill: {
+						name: name,
+						email: email,
+						contact: contact
+					},
+					notes: {
+						address: address
+					},
+					theme: {
+						color: '#0d94fb'
+					},
+					handler: function(response) {
+						showLoading();
+						sendData(response.razorpay_payment_id, payment_method, 'success');
+					}
+				};
+				var rzp1 = new Razorpay(options);
+				rzp1.on('payment.failed', function(response) {
+					alert(response.error.description);
+				});
+				rzp1.open();
+			}
+			
+			function sendData(transID, payment_method, status) {
+				fetch(url, {
+						method: 'POST',
+						headers: {
+							"Content-Type": "application/json",
+							"X-CSRFToken": csrftoken,
+						},
+						body: JSON.stringify({
+							orderID: orderID,
+							transID: transID,
+							payment_method: payment_method,
+							status: status,
+						}),
+					})
+					.then((response) => response.json())
+					.then((data) => {
+						window.location.href = redirect_url + '?order_number=' + data.order_number + '&payment_id=' + data.transID;
+					});
+			}
+			
+			// Call the payment functions
+			paypalPayment(); // PayPal payment by default
+			
+			</script>
+			
+
+        {% endblock content %}

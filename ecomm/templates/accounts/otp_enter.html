@@ -1,0 +1,96 @@
+{% extends "layout/base.html" %}
+{% block title %}OTP{% endblock title %}
+{% block content %}
+{% load static %}
+{% include "includes/alert.html" %}
+<style>
+    .otp.form-control {
+        text-align: center;
+        font-size: 50px;
+        font-family: monospace;
+        letter-spacing: 20px;
+    }
+
+    .otp.center-placeholder {
+        text-align: center;
+        position: relative;
+    }
+
+    .otp.center-placeholder input {
+        text-align: center;
+        padding-right: 0;
+        font-size: 30px;
+    }
+
+    .otp.center-placeholder::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        border-top: 1px solid #000;
+        border-bottom: 1px solid #000;
+    }
+
+    .otp.center-placeholder::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: calc(25% - 1px);
+        width: 1px;
+        background-color: #000;
+        padding-right: 0;
+    }
+
+    .otp.center-placeholder input::placeholder {
+        text-align: center;
+    }
+</style>
+
+<div class="container mb-5 mt-5">
+    <div class="login-popup">
+        <div class="form-box">
+            <div class="tab tab-nav-simple tab-nav-boxed form-tab">
+                <ul class="nav nav-tabs nav-fill align-items-center border-no justify-content-center mb-5" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active border-no lh-1 ls-normal">Enter OTP</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="signin">
+                        <form action="{% url 'enter-otp' %}" method='post'>
+                            {% csrf_token %}
+                            <div class="form-group mb-3">
+                                <label>ENTER OTP</label>
+                                <input type="text" class="form-control otp" id="singin-otp" name="otp" placeholder="0000 " required min="0" max="9999 maxlength="4" oninput="this.value = this.value.replace(/[^0-9]/g, '').substring(0, 4)" />
+                            </div>
+                            <div class="text-center mb-5">
+                                <a href="{% url "login" %}" class="lost-link">Resend OTP</a>
+                            </div>
+                            <button class="btn btn-dark btn-block btn-rounded" type="submit">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+<script>
+    // Function to add class for centering placeholder on input focus
+    function centerPlaceholder() {
+        document.getElementById("singin-otp").classList.add("center-placeholder");
+    }
+
+    // Function to remove class when input loses focus
+    function removeCenterPlaceholder() {
+        document.getElementById("singin-otp").classList.remove("center-placeholder");
+    }
+
+    // Add event listeners to call the functions
+    document.getElementById("singin-otp").addEventListener("focus", centerPlaceholder);
+    document.getElementById("singin-otp").addEventListener("blur", removeCenterPlaceholder);
+</script>
+
+{% endblock content %}

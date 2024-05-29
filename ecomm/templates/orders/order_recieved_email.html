@@ -1,0 +1,85 @@
+{% autoescape off %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Received</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+        margin: 0;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+    }
+
+    .branding {
+        text-align: center;
+        margin-bottom: 20px;
+        background-color: #007bff;
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .branding img {
+        width: 100px;
+        height: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        border-radius: 5px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    .thank-you {
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+</head>
+<body>
+
+<div class="container" style="background-color: #007bff;">
+  <div class="branding">
+      <img src="https://d-themes.com/html/riode/landing/images/logo.png" alt="Your Company Logo">
+      <h1>RIODE ECOMM</h1>
+  </div>
+</div>
+<div class="container">
+  <p>Dear {{order.first_name}},</p>
+  <p>Thank you for placing an order with RIODE ECOMM. We are pleased to confirm the receipt of your order #{{order.order_number}}, dated {{order.created_at}}.</p>
+  <p>Your order is now being processed, and we will ensure its prompt dispatch. You will receive a notification once your order has been confirmed.</p>
+</div>
+
+
+</body>
+</html>
+{% endautoescape %}

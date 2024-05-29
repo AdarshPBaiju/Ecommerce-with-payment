@@ -1,0 +1,143 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}{{order.order_number}}{% endblock title %}
+{% block content %}
+
+		<main class="main order">
+			<div class="page-content pt-7 pb-10 mb-10">
+				<div class="container mt-8">
+
+
+					<div class="order-results" >
+						<div class="overview-item">
+							<span>Order ID:</span>
+							<strong style="font-size: 15px;">{{order.order_number}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Transaction ID:</span>
+							<strong style="font-size: 15px;">{{order.payment.payment_id}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Status:</span>
+                            {% if order.status == 'OUT_FOR_DELIVERY' %}
+							<strong style="font-size: 15px;">OUT FOR DELIVERY</strong>
+                            {% else %}
+							<strong style="font-size: 15px;">{{order.status}}</strong>
+                            {% endif %}
+						</div>
+						<div class="overview-item">
+							<span>Date:</span>
+							<strong style="font-size: 15px;">{{order.created_at}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Email:</span>
+							<strong style="font-size: 15px;">{{order.email}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Payment method:</span>
+							<strong style="font-size: 15px;">{{order.payment.payment_method}}</strong>
+						</div>
+                        {% if order.status == 'SHIPPED' or order.status == 'OUT_FOR_DELIVERY' %}
+						<div class="overview-item">
+							<span>Courier Partner:</span>
+							<strong style="font-size: 15px;">{{order.courier_company_name}}</strong>
+						</div>
+						<div class="overview-item">
+							<span>Tracking ID:</span>
+							<strong style="font-size: 15px;">{{order.tracking_id}}</strong>
+						</div>
+                        {% endif %}
+					</div>
+					<h2 class="title title-simple text-left pt-4 font-weight-bold text-uppercase">Order Details</h2>
+					<div class="order-details">
+						<table class="order-details-table">
+							<thead>
+								<tr class="summary-subtotal">
+									<td>
+										<h3 class="summary-subtitle">Product</h3>
+									</td>
+									<td></td>
+								</tr>
+							</thead>
+							<tbody>
+                                {% for item in order_detail %}
+								<tr>
+									<td class="product-name">{{item.product|truncatechars:40}}
+                                        
+                                        {% if item.variation.all %}
+                                        {% for i in item.variation.all %}
+                                        <span style="font-weight: 400;">&nbsp;{{i.variation_category|capfirst}} : {{i.variation_value|capfirst}}</span>
+                                        {% endfor %}
+                                        {% endif %}
+                                    
+                                        <span>&nbsp;&nbsp; <i class="fas fa-times"></i>&nbsp;&nbsp;
+											{{item.quantity}}</span></td>
+									<td class="product-price">${{item.product_price}}</td>
+								</tr>
+                                {% endfor %}
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Subtotal:</h4>
+									</td>
+									<td class="summary-subtotal-price">${{subtotal|floatformat:"2"}}</td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Tax(3%):</h4>
+									</td>
+									<td class="summary-subtotal-price">${{order.tax|floatformat:"2"}}</td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Shipping:</h4>
+									</td>
+									<td class="summary-subtotal-price">
+                                        {% if order.shipping_cost == 0 %}
+                                            Free
+                                        {% else %}
+                                            {{ order.shipping_cost }}
+                                        {% endif %}
+                                    </td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Payment method:</h4>
+									</td>
+									<td class="summary-subtotal-price">{{order.payment.payment_method}}</td>
+								</tr>
+								<tr class="summary-subtotal">
+									<td>
+										<h4 class="summary-subtitle">Total:</h4>
+									</td>
+									<td>
+										<p class="summary-total-price">${{order.order_total|floatformat:"2"}}</p>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<h2 class="title title-simple text-left pt-10 mb-2">Billing Address</h2>
+					<div class="address-info pb-8 mb-6">
+						<p class="address-detail pb-2">
+							{{order.full_name}}<br>
+							{{order.house_no}}<br>
+							{{order.area}}<br>
+							{{order.landmark}}<br>
+							{{order.city}}<br>
+							{{order.state}}<br>
+							{{order.country}}<br>
+							{{order.pincode}}
+						</p>
+                        {% if order.order_note %}
+                        <P><strong>Order Note: </strong>{{order.order_note}}</P>
+                        {% endif %}
+						<p class="email">{{order.email}}</p>
+						<p class="email">{{order.phone}}</p>
+					</div>
+
+					<a href="{% url "my_orders" %}" class="btn btn-icon-left btn-dark btn-back btn-rounded btn-md mb-4"><i class="d-icon-arrow-left"></i> Back to My Orders</a>
+				</div>
+			</div>
+		</main>
+		<!-- End Main -->
+{% endblock content %}

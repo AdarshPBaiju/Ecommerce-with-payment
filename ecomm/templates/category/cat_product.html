@@ -1,0 +1,61 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}{{category}}{% endblock title %}
+{% block content %}
+
+<main class = "main">
+   <div  class = "page-header"
+   style = "background-image: url('{% static "images/shop/page-header-back.jpg" %}'); background-color: #3C63A4;">
+   <h3   class = "page-subtitle">Store</h3>
+   <h1   class = "page-title">{{category}}</h1>
+   {% if product_count == 0 %}
+   <p style = "color: white; font-size: 1.2em;">No Product Found Please Search Again</p>
+   {% else %}
+   <p style = "color: white; font-size: 1.2em;">{{product_count}} product found</p>
+   {% endif %}
+   <ul    class = "breadcrumb">
+      <li><a href  = "{% url "home" %}"><i class = "d-icon-home"></i></a></li>
+      <li    class = "delimiter">/</li>
+      <li>{{category}}</li>
+   </ul>
+   </div>
+   <!-- End PageHeader -->
+   <div class = "page-content mb-10 pb-6">
+      <div class = "container">
+         {% if product_count != 0 %}
+         <div class = "row cols-2 cols-sm-3 cols-md-4 product-wrapper">
+            {% for p in products %}
+            <div    class = "product-wrap" style="margin-top: 50px;">
+               <div    class = "product text-center">
+                  <figure class = "product-media">
+                     <a      href  = "{{p.get_url}}">
+                     <img    src   = "{{p.images.url}}" alt = "product" width = "280" height = "315">
+                     </a>
+                     <div   class = "product-label-group">
+                        <label class = "product-label label-new">{{ p.discount_percentage }}% off</label>
+                     </div>
+                  </figure>
+                  <div class = "product-details">
+                     <div class = "product-cat">
+                        <a  >{{ p.brand }}</a>
+                     </div>
+                     <div class = "product-cat">
+                        <a   href  = "{% url "category_product" p.category.slug %}">{{ p.category }}</a>
+                     </div>
+                     <h3 class = "product-name">
+                        <a  href  = "{{p.get_url}}">{{ p.product_name }}</a>
+                     </h3>
+                     <div class = "product-price">
+                        <ins class = "new-price">${{ p.price }}</ins>{% if p.old_price %}<del class = "old-price">${{ p.old_price }}</del>{% endif %}
+                     </div>
+                  </div>
+               </div>
+            </div>
+            {% endfor %}
+         </div>
+         {% endif %}
+      </div>
+   </div>
+</main>
+<!-- End Main -->
+{% endblock content %}

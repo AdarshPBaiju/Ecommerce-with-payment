@@ -1,0 +1,72 @@
+{% extends "layout/base.html" %}
+{% block title %}Dashboard{% endblock title %}
+{% block content %}
+{% load static %}
+<style>
+    .profile-picture {
+    border-radius: 50%;
+    width: 60px; /* Adjust the width and height as needed */
+    height: 60px; /* Adjust the width and height as needed */
+    object-fit: cover;
+}
+</style>
+{% include "includes/alert.html" %}
+<main class="main account">
+    <nav class="breadcrumb-nav">
+        <div class="container">
+            <ul class="breadcrumb">
+                <li><a href="{% url "home" %}"><i class="d-icon-home"></i></a></li>
+                <li>Account</li>
+            </ul>
+        </div>
+    </nav>
+    <div class="page-content mt-4 mb-10 pb-6">
+        <div class="container">
+            <h2 class="title title-center mb-10">My Account</h2>
+            <div class="tab tab-vertical gutter-lg">
+                {% include "includes/dashboard_sidebar.html" %}
+                <main class="col-md-9" style="background-color: rgba(255, 255, 255, 0.873); border: 1px solid rgb(163, 163, 163); border-radius: 10px; padding: 30px; margin-left: 20px;">
+                    <article class="card">
+                        <header class="card-header" style="margin-top: 5px;">
+                            <strong class="d-inline-block mr-3">Logined as:</strong>
+                            <span>{{user.first_name}} {{user.last_name}}</span>
+                        </header>
+                        <div class="card-body">
+                            <div class="row" style="margin-top: 20px;">
+                                <div class="col-md-6" style="border: 1px solid rgb(163, 163, 163); border-radius: 10px; padding: 5px; margin-top: 25px; max-width: 420px;">
+                                    <div class="card" style="text-align: center;">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Total Orders</h5>
+                                            <h4>{{orders_count}}</h4>
+                                            <a href="{% url 'my_orders' %}">View Orders</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="border: 1px solid rgb(163, 163, 163); border-radius: 10px; padding: 5px; max-width: 410px; margin-left: 25px; margin-top: 25px;">
+                                    <div class="card" style="text-align: center;">
+                                        <div class="card-body">
+                                            <img src="{{userprofile.profile_picture.url}}" alt="Profile Picture"  class="profile-picture">
+                                            <p class="mb-0">{{user.email}}</p>
+                                            <p>{{user.phone_number}}</p>
+                                            {% if request.user.is_two_factor %}
+                                            <a href="{% url 'toggle_two_factor' %}" style="color: red;" >
+                                                Disable Two Factor Authentication
+                                            </a>
+                                            {% else %}
+                                            <a href="{% url 'toggle_two_factor' %}" style="color: green;" >
+                                                Enable Two Factor Authentication
+                                            </a>
+                                            {% endif %} 
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </main>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- End Main -->
+{% endblock content %}

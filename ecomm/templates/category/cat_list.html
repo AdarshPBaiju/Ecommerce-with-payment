@@ -1,0 +1,33 @@
+{% extends "layout/base.html" %}
+{% block title %}Category{% endblock title %}
+{% block content %}
+{% load static %}
+
+<section class="pt-10 mt-7 appear-animate" data-animation-options="{
+   'delay': '.3s'
+   }">
+   <div class="container">
+      <h1 class="page-title text-center mb-5">Our Categories</h1>
+      <br>
+      <div class="row">
+         {% for c in categories %}
+         <div class="col-xs-6 col-lg-3 mb-4">
+            <div class="category category-default1 category-absolute banner-radius overlay-zoom" >
+               <a href="{% url "category_product" c.slug %}" target="_blank">
+               <figure class="category-media">
+                  <img src="{{c.cat_image.url}}" alt="category"  width="280"
+                     height="280" style="background-color: #8c8c8d;" />
+               </figure>
+               </a>
+               <div class="category-content" >
+                  <h4 class="category-name font-weight-bold ls-l"><a href="{% url "category_product" c.slug %}" target="_blank">{{c.category_name}}</a></h4>
+               </div>
+            </div>
+         </div>
+         {% endfor %}
+      </div>
+   </div>
+</section>
+<br>
+<br>
+{% endblock content %}

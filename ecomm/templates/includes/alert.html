@@ -1,0 +1,57 @@
+{% if messages %}
+<div class="col-md-6 mb-4">
+    {% for message in messages %}
+    <div {% if message.tags %} class="alert alert-{{message.tags}} alert-dark alert-round alert-inline Message" {% endif %}>
+        <h4 class="alert-title"> {% if message.tags %} {{message.tags}} {% endif %}:</h4>
+        {{message}}&nbsp;&nbsp;
+        <button type="button" class="btn btn-link btn-close">
+        <i class="d-icon-times"></i>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+<style>
+   .Message {
+        position: absolute;
+        {% comment %} display: flex; {% endcomment %}
+        {% comment %} flex-direction: column; {% endcomment %}
+        top: 170px;
+        right: -100%;
+        max-width: calc(100% - 20px);
+        animation: slideInRight 0.5s forwards;
+        z-index: 9999;
+    }
+
+    @keyframes slideInRight {
+        0% { right: -100%; }
+        100% { right: 20px; }
+    }
+
+    @keyframes slideOutRight {
+        0% { right: 20px; /*  }
+        100% { right: -100%; }
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var successMessages = document.querySelectorAll('.Message');
+        
+        successMessages.forEach(function(successMessage) {
+            // Function to slide out the message
+            function slideOut() {
+                successMessage.style.animation = 'slideOutRight 0.5s forwards';
+                setTimeout(function() {
+                    successMessage.remove();
+                }, 500); // Animation duration
+            }
+            
+            // Slide out after 10 seconds
+            setTimeout(slideOut, 10000); // 10 seconds
+            
+            // Slide in animation
+            successMessage.style.animation = 'slideInRight 0.5s forwards';
+        });
+    });
+</script>

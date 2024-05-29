@@ -1,0 +1,57 @@
+{% extends "layout/base.html" %}
+{% block title %}Dashboard{% endblock title %}
+{% block content %}
+{% load static %}
+{% include "includes/alert.html" %}
+<main class="main account">
+    <nav class="breadcrumb-nav">
+        <div class="container">
+            <ul class="breadcrumb">
+                <li><a href="{% url "home" %}"><i class="d-icon-home"></i></a></li>
+                <li>Account</li>
+            </ul>
+        </div>
+    </nav>
+    <div class="page-content mt-4 mb-10 pb-6">
+        <div class="container">
+            <h2 class="title title-center mb-10">My Orders</h2>
+            <div class="tab tab-vertical gutter-lg">
+                {% include "includes/dashboard_sidebar.html" %}
+                <main class="col-md-9" style="background-color: rgba(255, 255, 255, 0.873); border: 1px solid rgb(163, 163, 163); border-radius: 10px; padding: 30px; margin-left: 20px;">
+                    <div class="tab-pane" id="orders">
+                        <table class="order-table">
+                            <thead>
+                                <tr>
+                                    <th class="pl-2">Order</th>
+                                    <th>Billing Name</th>
+                                    <th>Phone</th>
+                                    <th>Total</th>
+                                    <th>Delivery Date</th>
+                                    <th style="margin-left: 10px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td class="order-number"><a href="{% url "order_detail" order.order_number %}">{{order.order_number}}</a></td>
+                                    <td class="order-date"><time>{{order.full_name}}</time></td>
+                                    <td class="order-status">{{order.phone}}</td>
+                                    <td class="order-total"><span>${{order.order_total|floatformat:"2"}}</span></td>
+                                    <td class="order-status" style="margin-left: 10px;"><span>{{order.expected_delivery_date|date:"j M Y"}}</span></td>
+                                    {% if order.status == 'OUT_FOR_DELIVERY' %}
+                                    <td class="order-status" style="margin-left: 10px;"><span>OUT FOR DELIVERY</span></td>
+                                    {% else %}
+                                    <td class="order-status" style="margin-left: 10px;"><span>{{order.status}}</span></td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- End Main -->
+{% endblock content %}

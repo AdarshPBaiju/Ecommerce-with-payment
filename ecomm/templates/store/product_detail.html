@@ -1,0 +1,412 @@
+{% extends "layout/base.html" %}
+{% load static %}
+{% block title %}{{single_product}}{% endblock title %}
+{% block seo %}
+   <meta property="og:title" content="{{single_product}}">
+   <meta name="keywords" content="{% for keyword in seo_keywords %}{{keyword.seo_keyword}},{% endfor %}">
+   <meta property="og:description" content="{{single_product.description}}">
+   <meta property="og:image" content="{{single_product.images.url}}">
+   <meta property="og:url" content="{{current_url}}">
+
+{% endblock seo %}
+{% block content %}
+{% include "includes/alert.html" %}
+<main class="main mt-6 single-product">
+   <div class="page-content mb-10 pb-6">
+      <div class="container">
+         <div class="product product-single row mb-7">
+            <div class="col-md-6 sticky-sidebar-wrapper">
+               <div class="product-gallery pg-vertical sticky-sidebar"
+                  data-sticky-options="{'minWidth': 767}">
+                  <div class="product-single-carousel owl-carousel owl-theme owl-nav-inner row cols-1">
+                     <figure class="product-image">
+                        <img src="{{single_product.images.url}}"
+                           data-zoom-image="{{single_product.images.url}}"
+                           alt="Women's Brown Leather Backpacks" width="800" height="900">
+                     </figure>
+                     {% for image in product_gallery %}
+                     <figure class="product-image">
+                        <img src="{{image.image.url}}"
+                           data-zoom-image="{{image.image.url}}"
+                           alt="Women's Brown Leather Backpacks" width="800" height="900">
+                     </figure>
+                     {% endfor %}
+                  </div>
+                  <div class="product-thumbs-wrap">
+                     <div class="product-thumbs">
+                        <div class="product-thumb active">
+                           <img src="{{single_product.images.url}}" alt="product thumbnail"
+                              width="109" height="122">
+                        </div>
+                        {% for image in product_gallery %}
+                        <div class="product-thumb">
+                           <img src="{{image.image.url}}" alt="product thumbnail"
+                              width="109" height="122">
+                        </div>
+                        {% endfor %}
+                     </div>
+                     <button class="thumb-up disabled"><i class="fas fa-chevron-left"></i></button>
+                     <button class="thumb-down disabled"><i class="fas fa-chevron-right"></i></button>
+                  </div>
+                  <div class="product-label-group">
+                     <label class="product-label label-new">{{single_product.discount_percentage}} % off</label>
+                  </div>
+               </div>
+            </div>
+            <div class="col-md-6">
+               <form action="{% url "add_cart" single_product.id %}" method="post">
+                  {% csrf_token %}
+                  <div class="product-details">
+                     <div class="product-navigation">
+                        <ul class="breadcrumb breadcrumb-lg">
+                           <li><a href="{% url "home" %}"><i class="d-icon-home"></i></a></li>
+                           <li><a target="_blank" href="{% url "category_product" single_product.category.slug %}" class="active">{{single_product.category}}</a></li>
+                           <li>{{single_product|truncatewords:4}}</li>
+                        </ul>
+                     </div>
+
+                     <h1 class="product-name">{{single_product}}</h1>
+                     <div class="product-meta">
+                        BRAND: <span class="product-brand">{{single_product.brand}}</span>
+                     </div>
+                     <div class="product-price">
+                        <ins class="new-price">${{ single_product.price }}</ins>
+                        {% if single_product.old_price and single_product.old_price > single_product.price %}
+                        <del class="old-price">${{ single_product.old_price }}</del>
+                        {% endif %}
+                     </div>
+                     <div class="ratings-container">
+                        <div class="ratings-full">
+                           <span class="ratings" style="width:{{ average_rating_5star }}%"></span>
+                           <span class="tooltiptext tooltip-top"></span>
+                        </div>
+                        <a href="#product-tab-reviews" class="link-to-tab rating-reviews">( {{ review_count }} reviews )</a>
+                     </div>
+                     <p class="product-short-desc">{{single_product.description|truncatewords:45}}</p>
+                     {% if single_product.variation_set.colors %}
+                        <div class="product-form product-variations product-color">
+                           <label>Color:</label>
+                           <div class="select-box">
+                              <select name="color" class="form-control" required>
+                                 <option value="" disabled selected>Choose Color</option>
+                                 {% for i in single_product.variation_set.colors %}
+                                 <option value="{{i.variation_value}}">{{i.variation_value}}</option>
+                                 {% endfor %}
+                              </select>
+                           </div>
+                        </div>
+                        {% endif %}
+                        {% if single_product.variation_set.sizes %}
+                        <div class="product-form product-variations product-size">
+                           <label>Size:</label>
+                           <div class="product-form-group">
+                              <div class="select-box">
+                                 <select name="size" class="form-control" required>
+                                    <option value="" disabled selected>Choose Size</option>
+                                    {% for i in single_product.variation_set.sizes %}
+                                    <option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}</option>
+                                    {% endfor %}
+                                 </select>
+                              </div>
+                           </div>
+                        </div>
+                        {% endif %}
+                     <hr class="product-divider">
+                     <div class="product-form product-qty">
+                        <div class="product-form-group">
+                           {% if single_product.stock <= 0 %}
+                           <button type="submit" class="btn btn-muted text-normal ls-normal font-weight-semi-bold " style="font-size: 18px;" disabled>
+                              <i class="d-icon-bag"></i>&nbsp;Out Of Stock
+                          </button>
+                          
+                           {% else %}
+                           <button  type="submit" class="btn btn-primary text-normal ls-normal font-weight-semi-bold" style="font-size: 18px;"><i
+                           class="d-icon-bag"></i>&nbsp;Add to
+                        Cart</button>
+                           {% endif %}
+                        </div>
+                     </div>
+                     <hr class="product-divider mb-3">
+                     <div class="product-footer">
+                     </div>
+                  </div>
+               </form>
+            </div>
+         </div>
+
+         <div class="tab tab-nav-simple product-tabs">
+            <ul class="nav nav-tabs justify-content-center" role="tablist">
+               <li class="nav-item">
+                  <a class="nav-link active" href="#product-tab-description">Description</a>
+               </li>
+               {% if has_specifications %}
+               <li class="nav-item">
+                  <a class="nav-link" href="#product-tab-specification">Specification</a>
+               </li>
+               {% endif %}
+               <li class="nav-item">
+                  <a class="nav-link" href="#product-tab-reviews">Reviews ({{ review_count }})</a>
+               </li>
+            </ul>
+            <div class="tab-content">
+               <div class="tab-pane active in" id="product-tab-description">
+                  <div class="row mt-6">
+                     <div class="col-md-6">
+                        <h5 class="description-title mb-4 font-weight-semi-bold ls-m">Features</h5>
+                        <p class="mb-2">{{single_product.description}}</p>
+                     </div>
+                     <div class="col-md-6 pl-md-6 pt-4 pt-md-0">
+                        {% if single_product.video %}
+                        <h5 class="description-title font-weight-semi-bold ls-m mb-5">Video Description</h5>
+                        <figure class="p-relative d-inline-block mb-2">
+                           <img src="{{single_product.video_thumbnail.url}}" width="559" height="370" alt="Product" />
+                           <a class="btn-play btn-iframe" href="{{single_product.video.url}}">
+                           <i class="d-icon-play-solid"></i>
+                           </a>
+                        </figure>
+                        {% endif %}
+                        <div class="icon-box-wrap d-flex flex-wrap">
+                           <div class="icon-box icon-box-side icon-border pt-2 pb-2 mb-4 mr-10">
+                              <div class="icon-box-icon">
+                                 <i class="d-icon-lock"></i>
+                              </div>
+                              {% if single_product.warranty %}
+                              <div class="icon-box-content">
+                                 <h4 class="icon-box-title lh-1 pt-1 ls-s text-normal">{{single_product.warranty}} warranty</h4>
+                                 <p>Guarantee with no doubt</p>
+                              </div>
+                              {% endif %}
+                           </div>
+                           <div class="divider d-xl-show mr-10"></div>
+                           <div class="icon-box icon-box-side icon-border pt-2 pb-2 mb-4">
+                              <div class="icon-box-icon">
+                                 <i class="d-icon-truck"></i>
+                              </div>
+                              <div class="icon-box-content">
+                                 <h4 class="icon-box-title lh-1 pt-1 ls-s text-normal">Free shipping
+                                 </h4>
+                                 <p>On orders over $100</p>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               {% if has_specifications %}
+               <div class="tab-pane " id="product-tab-specification">
+                  <div class="row mt-6">
+                     <div class="col-md-6">
+                        <h5 class="description-title mb-3 font-weight-semi-bold ls-m">Specifications
+                        </h5>
+                        <style>
+                           th{
+                              text-align: start;
+                           }
+                        </style>
+                        <table >
+                           <tbody>
+                              {% for specification in specifications %}
+                              <tr>
+                                 <th class="font-weight-semi-bold text-dark pl-0">{{ specification.attribute }}</th>
+                                 <td class="pl-4">{{ specification.value }}</td>
+                              </tr>
+                              {% endfor %}
+                           </tbody>
+                        </table>
+                     </div>
+                  </div>
+               </div>
+               {% endif %}
+               <div class="tab-pane " id="product-tab-reviews">
+                  <div class="comments mb-8 pt-2 pb-2 border-no">
+                     <ul>
+                        {% for review in product_reviews %}
+                        <li>
+                           <div class="comment">
+                              <figure class="comment-media">
+                                 <a>
+                                    <img src="{{ review.user_profile_picture }}" style="border-radius: 50%;" alt="avatar">
+                                 </a>
+                              </figure>
+                              <div class="comment-body">
+                                 <div class="comment-rating ratings-container mb-0">
+                                    <div class="ratings-full">
+                                       <span class="ratings" style="width:{{ review.rating_percentage }}%"></span>
+                                       <span class="tooltiptext tooltip-top">4.00</span>
+                                    </div>
+                                 </div>
+                                 <div class="comment-user">
+                                    <span class="comment-date text-body">{{ review.created_at|date:"F d, Y \a\t g:i a" }}</span>
+                                    <h4><a>{{ review.user.first_name }}</a></h4>
+                                 </div>
+
+                                 <div class="comment-content">
+                                    <p>{{ review.review }}</p>
+                                 </div>
+                              </div>
+                           </div>
+                        </li>
+                        {% endfor %} 
+                     </ul>
+                  </div>
+                  <!-- End Comments -->
+                  {% if has_purchased %}
+                  <div class="reply">
+                     <div class="reply">
+                        <div class="title-wrapper text-left">
+                           <h3 class="title title-simple text-left text-normal">Add a Review</h3>
+                        </div>
+                        <form method="POST">
+                         {% csrf_token %}
+                         <label>How do you rate this product</label><br>
+                         <select name="rating" id="rating" required class="form-control mb-5">
+                             <option value="">Rate…</option>
+                             <option value="0.5">Very poor (0.5)</option>
+                             <option value="1">Not that bad (1.0)</option>
+                             <option value="1.5">Average (1.5)</option>
+                             <option value="2">Somewhat good (2.0)</option>
+                             <option value="2.5">Good (2.5)</option>
+                             <option value="3">Pretty good (3.0)</option>
+                             <option value="3.5">Very good (3.5)</option>
+                             <option value="4">Excellent (4.0)</option>
+                             <option value="4.5">Perfect (4.5)</option>
+                             <option value="5">Outstanding (5.0)</option>
+                         </select>
+                         <div class="row">
+                             <div class="col-md-12 mb-5">
+                                 <input type="text" class="form-control" id="reply-email" name="subject" placeholder="Subject" />
+                             </div>
+                         </div>
+                         <textarea id="reply-message" cols="30" rows="6" class="form-control mb-4" placeholder="Review" name="review"></textarea>
+                         <button type="submit" class="btn btn-primary btn-rounded">Submit<i class="d-icon-arrow-right"></i></button>
+                        </form>
+                     </div>
+                     
+                  </div>{% endif %}
+                  <!-- End Reply -->
+               </div>
+            </div>
+         </div>
+         {% if related_products %}
+         <section class="pt-3 mt-10">
+            <h2 class="title justify-content-center">Related Products</h2>
+            <div class="owl-carousel owl-theme owl-nav-full row cols-2 cols-md-3 cols-lg-4"
+               data-owl-options="{
+               'items': 5,
+               'nav': false,
+               'loop': false,
+               'dots': true,
+               'margin': 20,
+               'responsive': {
+               '0': {
+               'items': 2
+               },
+               '768': {
+               'items': 3
+               },
+               '992': {
+               'items': 4,
+               'dots': false,
+               'nav': true
+               }
+               }
+               }">
+               {% for p in related_products %}
+               <div    class = "product-wrap">
+                  <div    class = "product text-center">
+                     <figure class = "product-media">
+                        <a   target="_blank"   href  = "{{p.get_url}}">
+                        <img    src   = "{{p.images.url}}" alt = "product" width = "280" height = "315">
+                        </a>
+                        <div   class = "product-label-group">
+                           {% if p.stock == 0 %}
+                          <span class="product-label label-new">Out of Stock</span>
+                        {% else %}
+                          <span class="product-label label-new">{{ p.discount_percentage }}% off</span>
+                        {% endif %}
+                        </div>
+                     </figure>
+                     <div class = "product-details">
+                        <div class = "product-cat">
+                           <a>{{ p.brand }}</a>
+                        </div>
+                        <div class = "product-cat">
+                           <a target="_blank"  href  = "{% url "category_product" p.category.slug %}">{{ p.category }}</a>
+                        </div>
+                        <h3 class = "product-name">
+                           <a target="_blank"  href  = "{{p.get_url}}">{{ p.product_name }}</a>
+                        </h3>
+                        <div class = "product-price">
+                           <ins class = "new-price">${{ p.price }}</ins>{% if p.old_price %}<del class = "old-price">${{ p.old_price }}</del>{% endif %}
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               {% endfor %}
+            </div>
+         </section>
+         {% endif %}
+         {% if recently_visited_products %}
+         <section class="pt-3 mt-10">
+            <h2 class="title justify-content-center">Recently Visited Products</h2>
+            <div class="owl-carousel owl-theme owl-nav-full row cols-2 cols-md-3 cols-lg-4"
+               data-owl-options="{
+               'items': 5,
+               'nav': false,
+               'loop': false,
+               'dots': true,
+               'margin': 20,
+               'responsive': {
+               '0': {
+               'items': 2
+               },
+               '768': {
+               'items': 3
+               },
+               '992': {
+               'items': 4,
+               'dots': false,
+               'nav': true
+               }
+               }
+               }">
+               {% for p in recently_visited_products %}
+               <div    class = "product-wrap">
+                  <div    class = "product text-center">
+                     <figure class = "product-media">
+                        <a   target="_blank"   href  = "{{p.products.get_url}}">
+                        <img    src   = "{{p.products.images.url}}" alt = "product" width = "280" height = "315">
+                        </a>
+                        <div   class = "product-label-group">
+                           {% if p.products.stock == 0 %}
+                          <span class="product-label label-new">Out of Stock</span>
+                        {% else %}
+                          <span class="product-label label-new">{{ p.products.discount_percentage }}% off</span>
+                        {% endif %}
+                        </div>
+                     </figure>
+                     <div class = "product-details">
+                        <div class = "product-cat">
+                           <a>{{ p.products.brand }}</a>
+                        </div>
+                        <div class = "product-cat">
+                           <a target="_blank"  href  = "{% url "category_product" p.products.category.slug %}">{{ p.products.category }}</a>
+                        </div>
+                        <h3 class = "product-name">
+                           <a target="_blank"  href  = "{{p.products.get_url}}">{{ p.products.product_name }}</a>
+                        </h3>
+                        <div class = "product-price">
+                           <ins class = "new-price">${{ p.products.price }}</ins>{% if p.products.old_price %}<del class = "old-price">${{ p.products.old_price }}</del>{% endif %}
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               {% endfor %}
+            </div>
+         </section>
+         {% endif %}
+      </div>
+   </div>
+</main>
+<!-- End Main -->
+{% endblock content %}
