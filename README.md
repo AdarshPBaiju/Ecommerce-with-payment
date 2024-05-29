@@ -1,4 +1,4 @@
-![image](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxJzFGswt9QjK3n1cJOSzLWznGBvh_irztkw&s)
+<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRxJzFGswt9QjK3n1cJOSzLWznGBvh_irztkw&s" alt="Ecommerce Banner" width="100%">
 
 # Ecomm Project
 
