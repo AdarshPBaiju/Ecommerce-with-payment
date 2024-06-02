@@ -134,3 +134,6 @@ Ensure that the following settings are configured correctly in `ecomm/settings.p
 
 
 Home Page
+
+
+For more information, visit [this page](https://ecomm-riode.onrender.com/).
